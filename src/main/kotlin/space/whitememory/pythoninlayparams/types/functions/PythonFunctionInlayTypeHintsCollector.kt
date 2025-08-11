@@ -6,7 +6,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.refactoring.suggested.endOffset
+import com.intellij.psi.util.endOffset
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyFunction
@@ -37,7 +37,7 @@ class PythonFunctionInlayTypeHintsCollector(editor: Editor) :
 
         try {
             renderTypeHint(element, typeEvalContext, sink)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return true
         }
 

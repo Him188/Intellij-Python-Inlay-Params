@@ -50,7 +50,7 @@ enum class HintGenerator {
             type: PyType?,
             typeEvalContext: TypeEvalContext
         ): List<InlayInfoDetails>? {
-            if (type is PyTypedDictType && !type.isInferred()) return null
+            if (type is PyTypedDictType) return null
             if (
                 type is PyCollectionType
                 && type.name != null
@@ -58,7 +58,6 @@ enum class HintGenerator {
                 && type.elementTypes.isNotEmpty()
             ) {
                 val collectionName = when (type) {
-                    is PyTypedDictType -> "dict"
                     else -> type.name
                 } ?: return null
 
