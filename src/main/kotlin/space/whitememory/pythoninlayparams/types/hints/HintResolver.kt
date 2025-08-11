@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package space.whitememory.pythoninlayparams.types.hints
 
 import com.intellij.psi.util.PsiTreeUtil
@@ -18,7 +20,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
             if (assignedValue !is PyCallExpression) return true
@@ -34,7 +36,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -57,7 +59,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -91,13 +93,13 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
             assignedValue?.let {
                 typeEvalContext.getType(element.findAssignedValue() as PyTypedElement)?.let {
-                    return it !is PyGenericType
+                    return it !is PyTypeVarType
                 }
             }
 
@@ -112,7 +114,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean = PsiTreeUtil.getParentOfType(element, PyExceptPart::class.java) == null
     },
 
@@ -124,7 +126,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean = !PyUtil.isClassAttribute(element)
     },
 
@@ -135,7 +137,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             if (typeAnnotation is PyUnionType) {
                 return typeAnnotation.members.any { type ->
@@ -156,7 +158,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -195,7 +197,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignmentValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -233,7 +235,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignmentValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -258,7 +260,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignmentValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -284,7 +286,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -320,7 +322,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             if (typeAnnotation !is PyTupleType) return true
             if (typeAnnotation.elementTypes.filterNotNull().isEmpty()) return false
@@ -340,7 +342,7 @@ enum class HintResolver {
             element: PyTargetExpression,
             typeAnnotation: PyType?,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val assignedValue = PyUtil.peelArgument(element.findAssignedValue())
 
@@ -362,7 +364,7 @@ enum class HintResolver {
         element: PyTargetExpression,
         typeAnnotation: PyType?,
         typeEvalContext: TypeEvalContext,
-        settings: PythonVariablesInlayTypeHintsProvider.Settings
+        settings: PythonVariablesInlayTypeHintsProvider.Settings,
     ): Boolean
 
     abstract fun isApplicable(settings: PythonVariablesInlayTypeHintsProvider.Settings): Boolean
@@ -373,7 +375,7 @@ enum class HintResolver {
         fun resolve(
             element: PyTargetExpression,
             typeEvalContext: TypeEvalContext,
-            settings: PythonVariablesInlayTypeHintsProvider.Settings
+            settings: PythonVariablesInlayTypeHintsProvider.Settings,
         ): Boolean {
             val typeAnnotation = getExpressionAnnotationType(element, typeEvalContext)
 
@@ -415,7 +417,7 @@ enum class HintResolver {
 
         fun shouldShowTypeHint(
             element: PyElement,
-            typeEvalContext: TypeEvalContext
+            typeEvalContext: TypeEvalContext,
         ): Boolean {
             if (element.name == PyNames.UNDERSCORE) return false
             if (element is PyTargetExpression && element.isQualified) return false

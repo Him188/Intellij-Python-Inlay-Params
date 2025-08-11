@@ -4,7 +4,7 @@ import com.intellij.codeInsight.hints.InlayHintsSink
 import com.intellij.codeInsight.hints.presentation.InlayPresentation
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
-import com.intellij.refactoring.suggested.endOffset
+import com.intellij.psi.util.endOffset
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyTargetExpression
 import space.whitememory.pythoninlayparams.types.AbstractPythonInlayTypeHintsCollector
@@ -30,7 +30,7 @@ class PythonVariablesInlayTypeHintsCollector(
 
         try {
             renderTypeHint(element, typeEvalContext, sink)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return true
         }
 
