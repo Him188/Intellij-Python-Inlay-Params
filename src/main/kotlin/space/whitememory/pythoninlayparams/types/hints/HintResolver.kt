@@ -5,7 +5,7 @@ import com.jetbrains.python.PyNames
 import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.codeInsight.typing.PyTypingTypeProvider
 import com.jetbrains.python.psi.*
-import com.jetbrains.python.psi.impl.PyCallExpressionHelper
+import com.jetbrains.python.psi.impl.PyCallExpressionNavigator
 import com.jetbrains.python.psi.types.*
 import space.whitememory.pythoninlayparams.types.variables.PythonVariablesInlayTypeHintsProvider
 
@@ -172,7 +172,7 @@ enum class HintResolver {
 
             if (
                 assignedValue is PyCallExpression
-                && PyCallExpressionHelper.resolveCalleeClass(assignedValue) != null
+                && PyCallExpressionNavigator.getPyCallExpressionByCallee(assignedValue) != null
             ) {
                 // Handle case like User().get_name() and list()
                 if (typeAnnotation.isBuiltin || assignedValue.callee?.reference?.resolve() is PyFunction) {
@@ -216,8 +216,8 @@ enum class HintResolver {
             }
 
             if (expressionOperands.leftOperand is PyCallExpression && expressionOperands.rightOperand is PyCallExpression) {
-                val isFalsePartClass = PyCallExpressionHelper.resolveCalleeClass(expressionOperands.leftOperand) != null
-                val isTruePartClass = PyCallExpressionHelper.resolveCalleeClass(expressionOperands.rightOperand) != null
+                val isFalsePartClass = PyCallExpressionNavigator.getPyCallExpressionByCallee(expressionOperands.leftOperand) != null
+                val isTruePartClass = PyCallExpressionNavigator.getPyCallExpressionByCallee(expressionOperands.rightOperand) != null
 
                 if (isFalsePartClass && isTruePartClass) return false
             }
@@ -264,9 +264,9 @@ enum class HintResolver {
 
             if (assignmentValue !is PyCallExpression) return true
 
-            if (typeAnnotation is PyNoneType) return true
+            if (typeAnnotation is PyNoneLiteralExpression) return true
 
-            val resolvedClass = PyCallExpressionHelper.resolveCalleeClass(assignmentValue) ?: return true
+            val resolvedClass = PyCallExpressionNavigator.getPyCallExpressionByCallee(assignmentValue) ?: return true
 
             if (!collectionNames.contains(resolvedClass.name)) {
                 return resolvedClass.name != typeAnnotation?.name
@@ -424,7 +424,7 @@ enum class HintResolver {
 
             if (
                 typeAnnotation == null
-                || (element is PyFunction && typeAnnotation is PyNoneType)
+                || (element is PyFunction && typeAnnotation is PyNoneLiteralExpression)
                 || ((element is PyFunction || element is PyTargetExpression) && (element as PyTypeCommentOwner).typeCommentAnnotation != null)
                 || (element is PyAnnotationOwner && element.annotation != null)
             ) {
@@ -433,7 +433,7 @@ enum class HintResolver {
 
             if (typeAnnotation is PyUnionType) {
                 return !typeAnnotation.members.all {
-                    PyTypeChecker.isUnknown(it, false, typeEvalContext) || (it is PyNoneType || it == null)
+                    PyTypeChecker.isUnknown(it, false, typeEvalContext) || (it is PyNoneLiteralExpression || it == null)
                 }
             }
 
