@@ -384,7 +384,7 @@ enum class HintResolver {
 
         private fun resolveEnabled(
             settings: PythonVariablesInlayTypeHintsProvider.Settings
-        ): List<HintResolver> = values().filter { it.isApplicable(settings) }
+        ): List<HintResolver> = entries.filter { it.isApplicable(settings) }
 
         private fun isLiteralExpression(element: PyExpression?): Boolean {
             return element is PySequenceExpression || element is PyLiteralExpression || element is PySetCompExpression

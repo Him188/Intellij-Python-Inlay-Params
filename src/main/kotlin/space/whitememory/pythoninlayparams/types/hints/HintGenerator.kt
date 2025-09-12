@@ -233,7 +233,7 @@ enum class HintGenerator {
             type: PyType?,
             typeEvalContext: TypeEvalContext
         ): List<InlayInfoDetails> =
-            values().firstNotNullOf { it.handleType(element, type, typeEvalContext) }
+            entries.toTypedArray().firstNotNullOf { it.handleType(element, type, typeEvalContext) }
     }
 }
 

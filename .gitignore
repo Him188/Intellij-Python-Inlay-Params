@@ -1,5 +1,7 @@
 .gradle
 .idea
+.intellijPlatform
+.kotlin
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -38,6 +40,7 @@ bin/
 
 ### VS Code ###
 .vscode/
+.cursor/
 
 ### Mac OS ###
 .DS_Store
