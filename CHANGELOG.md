@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support modern IDE versions
+
 ## [0.3.6] - 2024-09-28
 
 ### Added
