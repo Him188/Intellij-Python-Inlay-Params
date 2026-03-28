@@ -3,20 +3,19 @@ package space.whitememory.pythoninlayparams.python
 import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.SdkAdditionalData
 import com.intellij.openapi.projectRoots.SdkTypeId
-import com.intellij.openapi.projectRoots.impl.MockSdk
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 import com.intellij.openapi.roots.OrderRootType
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.containers.ContainerUtil
-import com.intellij.util.containers.MultiMap
 import com.jetbrains.python.PyNames
-import com.jetbrains.python.codeInsight.typing.PyTypeShed.findRootsForLanguageLevel
-import com.jetbrains.python.codeInsight.userSkeletons.PyUserSkeletonsUtil
 import com.jetbrains.python.psi.LanguageLevel
 import com.jetbrains.python.sdk.PythonSdkUtil
 import org.jdom.Element
 import org.jetbrains.annotations.NonNls
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 
 
 object PythonMockSdk {
@@ -50,16 +49,17 @@ object PythonMockSdk {
         vararg additionalRoots: VirtualFile
     ): Sdk {
         val mockSdkPath = "testData/$pathSuffix"
-        val roots = MultiMap.create<OrderRootType, VirtualFile>()
-        roots.putValues(OrderRootType.CLASSES, createRoots(mockSdkPath, level))
-        roots.putValues(OrderRootType.CLASSES, listOf(*additionalRoots))
-        val sdk = MockSdk(
+        val homePath = detectPythonExecutable() ?: "$mockSdkPath/bin/python"
+        val sdk: Sdk = ProjectJdkImpl(
             name,
-            "$mockSdkPath/bin/python",
-            toVersionString(level),
-            roots,
-            sdkType
+            sdkType,
+            homePath,
+            toVersionString(level)
         )
+        val sdkModificator = sdk.sdkModificator
+        createRoots(mockSdkPath, level).forEach { sdkModificator.addRoot(it, OrderRootType.CLASSES) }
+        additionalRoots.forEach { sdkModificator.addRoot(it, OrderRootType.CLASSES) }
+        sdkModificator.applyChangesWithoutWriteAction()
 
         // com.jetbrains.python.psi.resolve.PythonSdkPathCache.getInstance() corrupts SDK, so have to clone
         return sdk.clone()
@@ -73,13 +73,30 @@ object PythonMockSdk {
             result,
             localFS.refreshAndFindFileByIoFile(File(mockSdkPath, PythonSdkUtil.SKELETON_DIR_NAME))
         )
-        ContainerUtil.addIfNotNull(result, PyUserSkeletonsUtil.getUserSkeletonsDirectory())
-        result.addAll(findRootsForLanguageLevel(level))
         return result
     }
 
     private fun toVersionString(level: LanguageLevel): String {
         return "Python " + level.toPythonVersion()
+    }
+
+    private fun detectPythonExecutable(): String? {
+        val candidates = buildList {
+            System.getenv("PYTHON_BINARY")?.let(::add)
+            add("/usr/bin/python3")
+            add("/usr/local/bin/python3")
+            add("/opt/homebrew/bin/python3")
+
+            val pathEntries = System.getenv("PATH").orEmpty()
+                .split(File.pathSeparatorChar)
+                .filter(String::isNotBlank)
+            pathEntries.forEach { entry ->
+                add(Path.of(entry, "python3").toString())
+                add(Path.of(entry, "python").toString())
+            }
+        }
+
+        return candidates.firstOrNull { candidate -> Files.isRegularFile(Path.of(candidate)) }
     }
 
     private class PyMockSdkType(private val myLevel: LanguageLevel) : SdkTypeId {

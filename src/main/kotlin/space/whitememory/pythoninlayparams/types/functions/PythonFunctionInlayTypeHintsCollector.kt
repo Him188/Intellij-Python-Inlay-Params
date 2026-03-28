@@ -11,6 +11,7 @@ import com.jetbrains.python.PyTokenTypes
 import com.jetbrains.python.psi.PyElement
 import com.jetbrains.python.psi.PyFunction
 import com.jetbrains.python.psi.PyParameterList
+import com.jetbrains.python.psi.PyStatementList
 import space.whitememory.pythoninlayparams.types.AbstractPythonInlayTypeHintsCollector
 import space.whitememory.pythoninlayparams.types.hints.HintResolver
 
@@ -25,7 +26,11 @@ class PythonFunctionInlayTypeHintsCollector(editor: Editor) :
         if (element !is PyFunction || element.nameNode == null) return false
 
         val colonToken = TokenSet.create(PyTokenTypes.COLON)
-        return element.node.getChildren(colonToken).isNotEmpty()
+        if (element.node.getChildren(colonToken).isEmpty()) return false
+
+        return PsiTreeUtil.getChildOfType(element, PyStatementList::class.java)
+            ?.statements
+            ?.isNotEmpty() == true
     }
 
     override fun collect(element: PsiElement, editor: Editor, sink: InlayHintsSink): Boolean {
